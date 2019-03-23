@@ -102,7 +102,7 @@ namespace WordGuessingGame
         {
             bool run = true;
 
-            do
+            while (run == true)
             {
                 Console.WriteLine("Admin Menu.  Please select an option: \n" +
                     "\n" +
@@ -123,7 +123,7 @@ namespace WordGuessingGame
                     bool valid = false;
 
                     Console.Clear();
-                    Console.Write("Please enter a single word to add to the list (Cannot contain spaces or special characters):\n" +
+                    Console.Write("Please enter a single word to add to the list (Cannot contain spaces or special characters)\n" +
                         "Or, enter X to quit without adding a new word: ");
                     string addWordInput = Console.ReadLine();
 
@@ -131,6 +131,7 @@ namespace WordGuessingGame
                     {
                         if (addWordInput.ToLower() == "x")
                         {
+                            Console.Clear();
                             valid = true;
                             break;
                         }
@@ -148,8 +149,29 @@ namespace WordGuessingGame
                 }
                 else if (homeInput == "3" || homeInput.ToUpper() == "DELETE" || homeInput.ToUpper() == "DELETE WORD")
                 {
-                    Console.Clear();
-                    DeleteWord(path);
+                    bool valid = false;
+                    string deleteWordInput = "";
+
+                    while (valid == false)
+                    {
+                        Console.Clear();
+                        ViewWordList(path);
+                        Console.Write("Please enter the word you would like to delete from the list\n" +
+                            "Or, enter X to quit without deleting any words: ");
+
+                        deleteWordInput = Console.ReadLine();
+
+                        if (deleteWordInput.ToLower() == "x")
+                        {
+                            Console.Clear();
+                            valid = true;
+                            break;
+                        }
+
+                        valid = DeleteWord(path, deleteWordInput);
+                        Console.Clear();
+                        ViewWordList(path);
+                    }
                 }
                 else if (homeInput == "4" || homeInput.ToUpper() == "EXIT" || homeInput.ToUpper() == "RETURN" || homeInput.ToUpper() == "MAIN" || homeInput.ToUpper() == "MAIN MENU")
                 {
@@ -160,7 +182,7 @@ namespace WordGuessingGame
                 {
                     Console.Clear();
                 }
-            } while (run == true);
+            }
         }
 
         public static void LaunchGame(string path)
@@ -190,25 +212,33 @@ namespace WordGuessingGame
         /// </summary>
         public static bool AddWord(string path, string addWordInput)
         {
+            string[] words = File.ReadAllLines(path);
+
             if (Regex.IsMatch(addWordInput, @"^[A-Z]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase))
             {
+
+                for (int i = 0; i < words.Length; i++)
+                {
+                    if (words[i] == addWordInput.ToLower())
+                    {
+                        DeleteWord(path, addWordInput);
+                        i = words.Length;
+                    }
+                }
 
                 using (StreamWriter sw = File.AppendText(path))
                 {
                     sw.WriteLine(addWordInput.ToLower());
                 }
 
-                string[] words = File.ReadAllLines(path);
+                words = File.ReadAllLines(path);
 
-                foreach (string word in words)
+                if (words[words.Length - 1] == addWordInput.ToLower())
                 {
-                    if (word == addWordInput.ToLower())
-                    {
-                        Console.WriteLine("Success!  Here is the new word list:\n" +
-                            "");
-                        ViewWordList(path);
-                        return true;
-                    }
+                    Console.WriteLine("Success!  Here is the new word list:\n" +
+                        "");
+                    ViewWordList(path);
+                    return true;
                 }
 
                 Console.WriteLine("Something went wrong... Please try again:");
@@ -223,17 +253,31 @@ namespace WordGuessingGame
         /// <summary>
         /// Deletes a word from the list
         /// </summary>
-        public static void DeleteWord(string path)
+        public static bool DeleteWord(string path, string deleteWordInput)
         {
+            string[] words = File.ReadAllLines(path);
 
+            File.Delete(path);
+
+            using (StreamWriter sw = new StreamWriter(path))
+            {
+                foreach (string word in words)
+                {
+                    if (word != deleteWordInput.ToLower())
+                    {
+                        sw.WriteLine(word);
+                    }
+                }
+            }
+            return true;
         }
 
         public static void createSeededList(string path)
         {
+            string[] starterWords = { "anime", "game", "coffee", "banana", "red" };
+
             using (StreamWriter sw = new StreamWriter(path))
             {
-                string[] starterWords = { "anime", "game", "coffee", "banana", "red" };
-
                 foreach (string word in starterWords)
                 {
                     sw.WriteLine(word);
