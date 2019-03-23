@@ -120,8 +120,31 @@ namespace WordGuessingGame
                 }
                 else if (homeInput == "2" || homeInput.ToUpper() == "ADD" || homeInput.ToUpper() == "ADD WORD")
                 {
+                    bool valid = false;
+
                     Console.Clear();
-                    AddWord(path);
+                    Console.Write("Please enter a single word to add to the list (Cannot contain spaces or special characters):\n" +
+                        "Or, enter X to quit without adding a new word: ");
+                    string addWordInput = Console.ReadLine();
+
+                    while (valid == false)
+                    {
+                        if (addWordInput.ToLower() == "x")
+                        {
+                            valid = true;
+                            break;
+                        }
+
+                        valid = AddWord(path, addWordInput);
+
+                        if (valid == false)
+                        {
+                            Console.Write("\n" +
+                                    "Please ONLY enter a single word to add to the list (Cannot contain spaces or special characters)\n" +
+                                    "Or, enter X to quit without adding a new word: ");
+                            addWordInput = Console.ReadLine();
+                        }
+                    }
                 }
                 else if (homeInput == "3" || homeInput.ToUpper() == "DELETE" || homeInput.ToUpper() == "DELETE WORD")
                 {
@@ -142,15 +165,7 @@ namespace WordGuessingGame
 
         public static void LaunchGame(string path)
         {
-            using (StreamReader sr = File.OpenText(path))
-            {
-                string s = "";
 
-                if ((s = sr.ReadLine()) != null)
-                {
-                    createSeededList(path);
-                }
-            }
         }
 
         /// <summary>
@@ -173,15 +188,35 @@ namespace WordGuessingGame
         /// <summary>
         /// Adds a word to the list
         /// </summary>
-        public static void AddWord(string path)
+        public static bool AddWord(string path, string addWordInput)
         {
-            Regex rgx = new Regex(@"/^\S *$/");
-            Console.Write("\n" +
-                "Please enter a single word to add to the list: ");
-            string addWordInput = Console.ReadLine();
-            using (StreamWriter sw = new StreamWriter(path))
+            if (Regex.IsMatch(addWordInput, @"^[A-Z]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase))
             {
 
+                using (StreamWriter sw = File.AppendText(path))
+                {
+                    sw.WriteLine(addWordInput.ToLower());
+                }
+
+                string[] words = File.ReadAllLines(path);
+
+                foreach (string word in words)
+                {
+                    if (word == addWordInput.ToLower())
+                    {
+                        Console.WriteLine("Success!  Here is the new word list:\n" +
+                            "");
+                        ViewWordList(path);
+                        return true;
+                    }
+                }
+
+                Console.WriteLine("Something went wrong... Please try again:");
+                return false;
+            }
+            else
+            {
+                return false;
             }
         }
 
