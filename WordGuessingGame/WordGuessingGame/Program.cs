@@ -149,29 +149,20 @@ namespace WordGuessingGame
                 }
                 else if (homeInput == "3" || homeInput.ToUpper() == "DELETE" || homeInput.ToUpper() == "DELETE WORD")
                 {
-                    bool valid = false;
-                    string deleteWordInput = "";
+                    Console.Clear();
+                    ViewWordList(path);
+                    Console.Write("Please enter the word you would like to delete from the list\n" +
+                        "Or, enter X to quit without deleting any words: ");
 
-                    while (valid == false)
+                    string deleteWordInput = Console.ReadLine();
+
+                    if (deleteWordInput.ToLower() != "x")
                     {
-                        Console.Clear();
-                        ViewWordList(path);
-                        Console.Write("Please enter the word you would like to delete from the list\n" +
-                            "Or, enter X to quit without deleting any words: ");
-
-                        deleteWordInput = Console.ReadLine();
-
-                        if (deleteWordInput.ToLower() == "x")
-                        {
-                            Console.Clear();
-                            valid = true;
-                            break;
-                        }
-
-                        valid = DeleteWord(path, deleteWordInput);
+                        DeleteWord(path, deleteWordInput);
                         Console.Clear();
                         ViewWordList(path);
                     }
+                    Console.Clear();
                 }
                 else if (homeInput == "4" || homeInput.ToUpper() == "EXIT" || homeInput.ToUpper() == "RETURN" || homeInput.ToUpper() == "MAIN" || homeInput.ToUpper() == "MAIN MENU")
                 {
@@ -185,17 +176,61 @@ namespace WordGuessingGame
             }
         }
 
+        /// <summary>
+        /// Launches the guessin game.
+        /// </summary>
+        /// <param name="path">Path to the file storing word list.</param>
         public static void LaunchGame(string path)
         {
+            bool correct = false;
+            string[] words = File.ReadAllLines(path);
+            string randomWord = words[GetRandomNumber(words.Length) - 1];
+            char[] answer = new char[randomWord.Length];
 
+            for (int i = 0; i < answer.Length; i++)
+            {
+                answer[i] = '_';
+            }
+
+            Console.Clear();
+
+            while (correct == false)
+            {
+                string guessInput = "";
+
+                Console.WriteLine("Here is your word:\n" +
+                    "");
+                    Console.Write($"{string.Join("  ", answer)}");
+
+                while (guessInput.Length != 1)
+                {
+                    Console.Write("\n" +
+                        "Please guess a letter: ");
+
+                    guessInput = Console.ReadLine();
+                }
+                char guessChar = Convert.ToChar(guessInput);
+                int index = GuessLetter(randomWord, guessChar);
+                if (index == 1)
+                {
+                    correct = true;
+                }
+            }
+        }
+
+        public static int GuessLetter(string randomWord, char guessChar)
+        {
+            return 1;
         }
 
         /// <summary>
-        /// Displays list of words saved in memory
+        /// Displays all words saved in the current word list.
         /// </summary>
+        /// <param name="path">Path to the file storing word list.</param>
         public static void ViewWordList(string path)
         {
             string[] words = File.ReadAllLines(path);
+
             Console.WriteLine("Word List:\n" +
                 "");
 
@@ -208,8 +243,11 @@ namespace WordGuessingGame
         }
 
         /// <summary>
-        /// Adds a word to the list
+        /// Adds a word to the list.  This word cannot contain spaces or special characters, and duplicate words will not be added.
         /// </summary>
+        /// <param name="path">Path to the file storing word list.</param>
+        /// <param name="addWordInput">Word the user would like to input.</param>
+        /// <returns>Returns true or false depending on success.</returns>
         public static bool AddWord(string path, string addWordInput)
         {
             string[] words = File.ReadAllLines(path);
@@ -253,25 +291,31 @@ namespace WordGuessingGame
         /// <summary>
         /// Deletes a word from the list
         /// </summary>
-        public static bool DeleteWord(string path, string deleteWordInput)
+        public static void DeleteWord(string path, string deleteWordInput)
         {
-            string[] words = File.ReadAllLines(path);
-
-            File.Delete(path);
-
-            using (StreamWriter sw = new StreamWriter(path))
+            if (Regex.IsMatch(deleteWordInput, @"^[A-Z]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase))
             {
-                foreach (string word in words)
+                string[] words = File.ReadAllLines(path);
+
+                File.Delete(path);
+
+                using (StreamWriter sw = new StreamWriter(path))
                 {
-                    if (word != deleteWordInput.ToLower())
+                    foreach (string word in words)
                     {
-                        sw.WriteLine(word);
+                        if (word != deleteWordInput.ToLower())
+                        {
+                            sw.WriteLine(word);
+                        }
                     }
                 }
             }
-            return true;
         }
 
+        /// <summary>
+        /// Generates a seeded word list.
+        /// </summary>
+        /// <param name="path">Path to the file storing word list.</param>
         public static void createSeededList(string path)
         {
             string[] starterWords = { "anime", "game", "coffee", "banana", "red" };
@@ -284,5 +328,18 @@ namespace WordGuessingGame
                 }
             }
         }
+
+        /// <summary>
+        /// Rolls a random number between 1 and the length of the current word list.
+        /// </summary>
+        /// <param name="listSize">This should be the length of the current word list.</param>
+        /// <returns>Random number within range</returns>
+        private static int GetRandomNumber(int listSize)
+        {
+            Random random = new Random();
+            int value = random.Next(1, listSize + 1);
+            return value;
+        }
+
     }
 }
