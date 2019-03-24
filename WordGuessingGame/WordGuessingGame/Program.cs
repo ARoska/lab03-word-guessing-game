@@ -125,7 +125,8 @@ namespace WordGuessingGame
                     bool valid = false;
 
                     Console.Clear();
-                    Console.Write("Please enter a single word to add to the list. Word must be at least 3 characters long and cannot contain spaces or special characters\n" +
+                    Console.Write("Please enter a single word to add to the list.\n" +
+                        "Word must be at least 3 characters long and cannot contain spaces or special characters\n" +
                         "Or, enter X to quit without adding a new word: ");
                     string addWordInput = Console.ReadLine();
 
@@ -143,7 +144,8 @@ namespace WordGuessingGame
                             if (valid == false)
                             {
                                 Console.Write("\n" +
-                                        "Please ONLY enter a SINGLE word to add to the list.  Word must be at least 3 characters long and CANNOT contain spaces or special characters\n" +
+                                        "Please ONLY enter a SINGLE word to add to the list.\n" +
+                                        "Word must be at least 3 characters long and CANNOT contain spaces or special characters\n" +
                                         "Or, enter X to quit without adding a new word: ");
                                 addWordInput = Console.ReadLine();
                             }
@@ -151,7 +153,8 @@ namespace WordGuessingGame
                         else
                         {
                             Console.Write("\n" +
-                                "Please ONLY enter a SINGLE word to add to the list.  Word must be at least 3 characters long and CANNOT contain spaces or special characters\n" +
+                                "Please ONLY enter a SINGLE word to add to the list.\n" +
+                                "Word must be at least 3 characters long and CANNOT contain spaces or special characters\n" +
                                 "Or, enter X to quit without adding a new word: ");
                             addWordInput = Console.ReadLine();
 

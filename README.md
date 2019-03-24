@@ -29,13 +29,21 @@ Then select and open ```WordGuessingGame.sln```
 
 ## Visuals
 
-##### Application Start
-![Image 1](https://via.placeholder.com/750x500)
-##### Using the Application
-![Image 1](https://via.placeholder.com/750x500)
-##### Application End
-![Image 1](https://via.placeholder.com/750x500)
+##### Game Home Menu
+![Game Home Menu](https://github.com/Roketsu86/lab03-word-guessing-game/blob/master/Assets/word-game-start.jpg)
+##### Playing the game
+![Playing the game](https://github.com/Roketsu86/lab03-word-guessing-game/blob/master/Assets/word-game-play.jpg)
+##### You win!
+![You win!](https://github.com/Roketsu86/lab03-word-guessing-game/blob/master/Assets/word-game-win.jpg)
+##### Admin Menu
+![Admin Menu](https://github.com/Roketsu86/lab03-word-guessing-game/blob/master/Assets/word-game-admin.jpg)
+##### Adding a word to the list
+![Adding a word to the list](https://github.com/Roketsu86/lab03-word-guessing-game/blob/master/Assets/word-game-add-word.jpg)
+##### Deleting a word from the list
+![Deleting a word from the list](https://github.com/Roketsu86/lab03-word-guessing-game/blob/master/Assets/word-game-delete-word.jpg)
 
 ------------------------------
 
 ## Change Log
+
+1.0: *First build!* - March 23 2019
