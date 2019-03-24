@@ -56,12 +56,13 @@ namespace WordGuessingGame
                 do
                 {
                     Console.Clear();
-                    Console.WriteLine("Welcome!  Please select an option: \n" +
+                    Console.WriteLine("Welcome!\n" +
                         "\n" +
                         "1. Start a new game \n" +
                         "2. Admin Menu \n" +
                         "3. Exit \n" +
                         "");
+                    Console.Write("Enter the number of the option you wish to select: ");
                     string homeInput = Console.ReadLine();
 
                     if (homeInput == "1" || homeInput.ToUpper() == "START" || homeInput.ToUpper() == "START GAME" || homeInput.ToUpper() == "PLAY" || homeInput.ToUpper() == "PLAY GAME" || homeInput.ToUpper() == "NEW" || homeInput.ToUpper() == "NEW GAME")
@@ -104,13 +105,14 @@ namespace WordGuessingGame
 
             while (run == true)
             {
-                Console.WriteLine("Admin Menu.  Please select an option: \n" +
+                Console.WriteLine("Admin Menu.\n" +
                     "\n" +
                     "1. View word bank \n" +
                     "2. Add word to bank \n" +
                     "3. Delete word from bank \n" +
                     "4. Return to main menu \n" +
                     "");
+                Console.Write("Enter the number of the option you wish to select: ");
                 string homeInput = Console.ReadLine();
 
                 if (homeInput == "1" || homeInput.ToUpper() == "VIEW" || homeInput.ToUpper() == "VIEW BANK")
@@ -123,7 +125,7 @@ namespace WordGuessingGame
                     bool valid = false;
 
                     Console.Clear();
-                    Console.Write("Please enter a single word to add to the list (Cannot contain spaces or special characters)\n" +
+                    Console.Write("Please enter a single word to add to the list. Word must be at least 3 characters long and cannot contain spaces or special characters\n" +
                         "Or, enter X to quit without adding a new word: ");
                     string addWordInput = Console.ReadLine();
 
@@ -135,17 +137,27 @@ namespace WordGuessingGame
                             valid = true;
                             break;
                         }
-
-                        valid = AddWord(path, addWordInput);
-
-                        if (valid == false)
+                        else if (addWordInput.Length > 2)
+                        {
+                            valid = AddWord(path, addWordInput);
+                            if (valid == false)
+                            {
+                                Console.Write("\n" +
+                                        "Please ONLY enter a SINGLE word to add to the list.  Word must be at least 3 characters long and CANNOT contain spaces or special characters\n" +
+                                        "Or, enter X to quit without adding a new word: ");
+                                addWordInput = Console.ReadLine();
+                            }
+                        }
+                        else
                         {
                             Console.Write("\n" +
-                                    "Please ONLY enter a single word to add to the list (Cannot contain spaces or special characters)\n" +
-                                    "Or, enter X to quit without adding a new word: ");
+                                "Please ONLY enter a SINGLE word to add to the list.  Word must be at least 3 characters long and CANNOT contain spaces or special characters\n" +
+                                "Or, enter X to quit without adding a new word: ");
                             addWordInput = Console.ReadLine();
+
                         }
                     }
+
                 }
                 else if (homeInput == "3" || homeInput.ToUpper() == "DELETE" || homeInput.ToUpper() == "DELETE WORD")
                 {
@@ -199,62 +211,73 @@ namespace WordGuessingGame
             while (correct == false)
             {
                 string guessInput = "";
-                Console.WriteLine("Here is your word:\n" +
+                Console.WriteLine("Guess the word, one letter at a time.  Good Luck!\n" +
                     "" +
                     $"{string.Join("  ", answerArray)}" +
                     "\n" +
-                    "Curren guesses:\n" +
-                    $"[{string.Join(" ", guessArray)}]");
+                    "Previous guesses: \n" +
+                    $"[{string.Join(" ", guessArray)}]\n" +
+                    "");
+                Console.Write("Please enter a letter (or type 'exit' to return to the Main Menu): ");
+                guessInput = Console.ReadLine();
 
-                while (guessInput.Length != 1)
+                if (guessInput.ToLower() == "exit")
+                {
+                    correct = true;
+                    break;
+                }
+                if (Regex.IsMatch(guessInput, @"^[A-Z]", RegexOptions.Compiled | RegexOptions.IgnoreCase))
+                {
+                    char guessChar = Convert.ToChar(guessInput);
+
+                    // Checks previous gusses and if current guess is new adds it to the list
+                    if (Array.IndexOf(guessArray, guessChar) == -1)
+                    {
+                        char[] tempArray = new char[(guessArray.Length + 1)];
+                        for (int i = 0; i < guessArray.Length; i++)
+                        {
+                            tempArray[i] = guessArray[i];
+                        }
+                        tempArray[guessArray.Length] = guessChar;
+                        guessArray = tempArray;
+                    }
+
+                    int[] indexArray = Guess(randomWord, guessChar);
+
+                    if (indexArray.Length == 0)
+                    {
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        for (int i = 0; i < indexArray.Length; i++)
+                        {
+                            int index = indexArray[i];
+                            answerArray[index] = guessChar;
+                        }
+                    }
+                    Console.Clear();
+
+                    // Checks if the user has completely guessed the word.
+                    if (Array.IndexOf(answerArray, '_') == -1)
+                    {
+                        correct = true;
+                        Console.WriteLine("You win! Press any key to return to the Main Menu.\n" +
+                            "" +
+                            $"{string.Join("  ", answerArray)}" +
+                            "\n" +
+                            "All guesses:\n" +
+                            $"[{string.Join(" ", guessArray)}]\n" +
+                            "\n");
+                        Console.ReadKey();
+                    }
+                }
+                else
                 {
                     Console.Write("\n" +
                         "Please guess a letter: ");
 
                     guessInput = Console.ReadLine();
-                }
-                char guessChar = Convert.ToChar(guessInput);
-
-                // Checks previous gusses and if current guess is new adds it to the list
-                if (Array.IndexOf(guessArray, guessChar) == -1)
-                {
-                    char[] tempArray = new char[(guessArray.Length + 1)];
-                    for (int i = 0; i < guessArray.Length; i++)
-                    {
-                        tempArray[i] = guessArray[i];
-                    }
-                    tempArray[guessArray.Length] = guessChar;
-                    guessArray = tempArray;
-                }
-
-                int[] indexArray = Guess(randomWord, guessChar);
-
-                if (indexArray.Length == 0)
-                {
-                    Console.Clear();
-                }
-                else
-                {
-                    for (int i = 0; i < indexArray.Length; i++)
-                    {
-                        int index = indexArray[i];
-                        answerArray[index] = guessChar;
-                    }
-                }
-                Console.Clear();
-
-                // Checks if the user has completely guessed the word.
-                if (Array.IndexOf(answerArray, '_') == -1)
-                {
-                    correct = true;
-                    Console.WriteLine("You win! Press any key to return to the Main Menu.\n" +
-                        "" +
-                        $"{string.Join("  ", answerArray)}" +
-                        "\n" +
-                        "All guesses:\n" +
-                        $"[{string.Join(" ", guessArray)}]\n" +
-                        "\n");
-                    Console.ReadKey();
                 }
             }
         }
