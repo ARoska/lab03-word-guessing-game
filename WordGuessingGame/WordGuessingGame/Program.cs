@@ -185,25 +185,26 @@ namespace WordGuessingGame
             bool correct = false;
             string[] words = File.ReadAllLines(path);
             string randomWord = words[GetRandomNumber(words.Length) - 1];
-            char[] answer = new char[randomWord.Length];
+            char[] answerArray = new char[randomWord.Length];
+            char[] guessArray = new char[0];
 
-            for (int i = 0; i < answer.Length; i++)
+            for (int i = 0; i < answerArray.Length; i++)
             {
-                answer[i] = '_';
+                answerArray[i] = '_';
             }
 
             Console.Clear();
 
+
             while (correct == false)
             {
                 string guessInput = "";
-                char[] guesses = new char[0];
                 Console.WriteLine("Here is your word:\n" +
-                    "");
-                Console.Write($"{string.Join("  ", answer)}");
-                Console.WriteLine("\n" +
-                    "Current guesses:\n" +
-                    $"[{string.Join(" ", guesses)}]");
+                    "" +
+                    $"{string.Join("  ", answerArray)}" +
+                    "\n" +
+                    "Curren guesses:\n" +
+                    $"[{string.Join(" ", guessArray)}]");
 
                 while (guessInput.Length != 1)
                 {
@@ -213,43 +214,79 @@ namespace WordGuessingGame
                     guessInput = Console.ReadLine();
                 }
                 char guessChar = Convert.ToChar(guessInput);
-                int[] index = Guess(randomWord, guessChar);
-                if (index.Length == 0)
+
+                // Checks previous gusses and if current guess is new adds it to the list
+                if (Array.IndexOf(guessArray, guessChar) == -1)
+                {
+                    char[] tempArray = new char[(guessArray.Length + 1)];
+                    for (int i = 0; i < guessArray.Length; i++)
+                    {
+                        tempArray[i] = guessArray[i];
+                    }
+                    tempArray[guessArray.Length] = guessChar;
+                    guessArray = tempArray;
+                }
+
+                int[] indexArray = Guess(randomWord, guessChar);
+
+                if (indexArray.Length == 0)
                 {
                     Console.Clear();
                 }
                 else
                 {
-                    for (int i = 0; i < index.Length; i++)
+                    for (int i = 0; i < indexArray.Length; i++)
                     {
-                        answer[i] = guessChar;
+                        int index = indexArray[i];
+                        answerArray[index] = guessChar;
                     }
                 }
                 Console.Clear();
+
+                // Checks if the user has completely guessed the word.
+                if (Array.IndexOf(answerArray, '_') == -1)
+                {
+                    correct = true;
+                    Console.WriteLine("You win! Press any key to return to the Main Menu.\n" +
+                        "" +
+                        $"{string.Join("  ", answerArray)}" +
+                        "\n" +
+                        "All guesses:\n" +
+                        $"[{string.Join(" ", guessArray)}]\n" +
+                        "\n");
+                    Console.ReadKey();
+                }
             }
         }
 
+        /// <summary>
+        /// Checks the user's guessed letter agains the random word currently in play.
+        /// If the letter is in the word anywhere it returns an array that has the position of every instance of that letter,
+        /// otherwise it returns an empty array.
+        /// </summary>
+        /// <param name="randomWord">Current random word being played.</param>
+        /// <param name="guessChar">User's guess character.</param>
+        /// <returns>Int array with all indexes of found character, or empty array if not found.</returns>
         public static int[] Guess(string randomWord, char guessChar)
         {
-            int[] index = new int[0];
+            int[] indexArray = new int[0];
 
             for (int i = 0; i < randomWord.Length; i++)
             {
                 if (randomWord[i] == guessChar)
                 {
-                    int[] tempIndex = new int[(index.Length + 1)];
+                    int[] tempArray = new int[(indexArray.Length + 1)];
 
-                    for (int j = 0; j < index.Length; j++)
+                    for (int j = 0; j < indexArray.Length; j++)
                     {
-                        tempIndex[j] = index[j];
+                        tempArray[j] = indexArray[j];
                     }
 
-                    tempIndex[(index.Length)] = i;
-                    index = tempIndex;
+                    tempArray[(indexArray.Length)] = i;
+                    indexArray = tempArray;
                 }
             }
-
-            return index;
+            return indexArray;
         }
 
 
@@ -321,6 +358,8 @@ namespace WordGuessingGame
         /// <summary>
         /// Deletes a word from the list
         /// </summary>
+        /// <param name="path">Path to the file storing word list.</param>
+        /// <param name="deleteWordInput">Word to be deleted.</param>
         public static void DeleteWord(string path, string deleteWordInput)
         {
             if (Regex.IsMatch(deleteWordInput, @"^[A-Z]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase))
