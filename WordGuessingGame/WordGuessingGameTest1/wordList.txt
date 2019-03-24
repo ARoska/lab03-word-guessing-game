@@ -2,7 +2,3 @@ apple
 seventhheaven
 nagisa
 tree
-apple
-seventhheaven
-nagisa
-tree

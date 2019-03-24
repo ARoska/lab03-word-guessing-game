@@ -197,10 +197,13 @@ namespace WordGuessingGame
             while (correct == false)
             {
                 string guessInput = "";
-
+                char[] guesses = new char[0];
                 Console.WriteLine("Here is your word:\n" +
                     "");
-                    Console.Write($"{string.Join("  ", answer)}");
+                Console.Write($"{string.Join("  ", answer)}");
+                Console.WriteLine("\n" +
+                    "Current guesses:\n" +
+                    $"[{string.Join(" ", guesses)}]");
 
                 while (guessInput.Length != 1)
                 {
@@ -210,18 +213,45 @@ namespace WordGuessingGame
                     guessInput = Console.ReadLine();
                 }
                 char guessChar = Convert.ToChar(guessInput);
-                int index = GuessLetter(randomWord, guessChar);
-                if (index == 1)
+                int[] index = Guess(randomWord, guessChar);
+                if (index.Length == 0)
                 {
-                    correct = true;
+                    Console.Clear();
                 }
+                else
+                {
+                    for (int i = 0; i < index.Length; i++)
+                    {
+                        answer[i] = guessChar;
+                    }
+                }
+                Console.Clear();
             }
         }
 
-        public static int GuessLetter(string randomWord, char guessChar)
+        public static int[] Guess(string randomWord, char guessChar)
         {
-            return 1;
+            int[] index = new int[0];
+
+            for (int i = 0; i < randomWord.Length; i++)
+            {
+                if (randomWord[i] == guessChar)
+                {
+                    int[] tempIndex = new int[(index.Length + 1)];
+
+                    for (int j = 0; j < index.Length; j++)
+                    {
+                        tempIndex[j] = index[j];
+                    }
+
+                    tempIndex[(index.Length)] = i;
+                    index = tempIndex;
+                }
+            }
+
+            return index;
         }
+
 
         /// <summary>
         /// Displays all words saved in the current word list.
