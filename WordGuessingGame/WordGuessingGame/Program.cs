@@ -16,10 +16,10 @@ namespace WordGuessingGame
             {
                 bool execute = true;
 
-                do
+                while (execute == true)
                 {
                     execute = NavigateHome();
-                } while (execute == true);
+                }
 
             }
             catch (Exception e)
@@ -44,7 +44,7 @@ namespace WordGuessingGame
         public static bool NavigateHome()
         {
             bool run = true;
-            string path = "../../../wordList.txt";
+            string path = "../../../word-list.txt";
 
             try
             {
@@ -53,7 +53,7 @@ namespace WordGuessingGame
                     createSeededList(path);
                 }
 
-                do
+                while (run == true)
                 {
                     Console.Clear();
                     Console.WriteLine("Welcome!\n" +
@@ -84,13 +84,21 @@ namespace WordGuessingGame
                         Console.WriteLine();
                     }
 
-                } while (run == true);
+                }
 
                 return false;
-
             }
             catch (FileNotFoundException)
             {
+                Console.Write("Uh-oh... The word list is no longer accessable.  Please wait while I make a new one.");
+                System.Threading.Thread.Sleep(500);
+                Console.Write(".");
+                System.Threading.Thread.Sleep(500);
+                Console.Write(".");
+                System.Threading.Thread.Sleep(500);
+                Console.Write(".\n" +
+                    "Done!  The app will now restart.");
+
                 createSeededList(path);
                 return true;
             }
@@ -413,7 +421,8 @@ namespace WordGuessingGame
         /// <param name="path">Path to the file storing word list.</param>
         public static void createSeededList(string path)
         {
-            string[] starterWords = { "anime", "game", "coffee", "banana", "red" };
+            string[] starterWords = { "anime", "game", "coffee", "banana", "red",
+                "funny", "lucky", "ducky", "faux", "bomb", "mock", "muck", "fuzzy", "jazz", "funny" };
 
             using (StreamWriter sw = new StreamWriter(path))
             {
